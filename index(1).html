@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#062f50">
+  <title>LARP Wallet</title>
+  <style>
+    :root{--navy:#173b56;--blue:#1676d2;--pale:#eaf3fb;--ink:#161b22;--muted:#858b95;--line:#eceef2;--bg:#f2f3f8;--green:#169b82;--red:#c34d4d;--logo-size:42px}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select{font:inherit} button{cursor:pointer}
+    .app{max-width:520px;margin:auto;min-height:100vh;background:#f2f3f8;box-shadow:0 0 35px #17354a0b;position:relative;padding-bottom:84px}
+    header{background:#f2f3f8;color:var(--ink);padding:22px 20px 8px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+    .brand{display:contents}.logo{width:var(--logo-size);height:var(--logo-size);border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden;font-size:21px;font-weight:700;flex:none;box-shadow:0 2px 12px #182b4210;grid-column:2;grid-row:1}.logo img{width:100%;height:100%;object-fit:contain;padding:5px}.brand-name{display:none}.subbrand{display:none}
+    .profile{width:42px;height:42px;border:0;border-radius:50%;background:#fff;color:#343a40;font-weight:700;box-shadow:0 2px 12px #182b4210;grid-column:1;grid-row:1}
+    .header-tools{grid-column:3;grid-row:1;justify-self:end;display:flex;gap:8px}.header-tool{width:42px;height:42px;border:0;border-radius:50%;background:#fff;color:#343a40;font-size:18px;box-shadow:0 2px 12px #182b4210}
+    nav{position:fixed;z-index:5;bottom:12px;left:50%;transform:translateX(-50%);width:min(480px,calc(100% - 28px));display:flex;justify-content:space-around;gap:2px;padding:8px 7px;background:#ffffffed;border:1px solid #e9eaf0;border-radius:28px;box-shadow:0 8px 30px #1b2d4518;backdrop-filter:blur(16px);overflow:auto}
+    nav button{border:0;background:transparent;color:#5d626b;padding:8px 10px;border-radius:20px;white-space:nowrap;font-size:11px;font-weight:650;min-width:64px}nav button:before{display:block;font-size:19px;line-height:1.25;margin-bottom:2px}nav button[data-view="home"]:before{content:"◉"}nav button[data-view="payments"]:before{content:"⇄"}nav button[data-view="transactions"]:before{content:"▤"}nav button[data-view="settings"]:before{content:"⚙"}
+    nav button.active,nav button:hover{background:#e8edf5;color:#1476d2}
+    main{padding:18px 16px 30px;max-width:500px;margin:auto}.view{display:none}.view.active{display:block}
+    .welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.welcome h1{font-size:23px;margin:0 0 4px;letter-spacing:-.7px}.muted{color:var(--muted)}.small{font-size:12px}
+    .home-top{display:flex;justify-content:center;gap:0;margin:12px auto 34px;background:#e5e6ec;border-radius:28px;padding:4px;width:218px}.home-top button{border:0;background:transparent;border-radius:24px;padding:12px 22px;font-size:13px;font-weight:700;color:#42464e}.home-top button.active{background:#fff;color:#1476d2;box-shadow:0 2px 8px #1b2d4510}
+    .balance-wrap{text-align:center;margin-bottom:34px}.balance-label{font-size:12px;color:#858b95}.balance{font-size:36px;font-weight:500;letter-spacing:-1.3px;margin:7px 0 0;color:#080b10}.account-meta{font-size:12px;color:#8b9099}
+    .overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}.overview-card{background:#fff;border-radius:25px;padding:15px 14px;min-height:170px;text-align:center}.overview-card .eyebrow{font-size:11px;color:#888d96}.overview-card strong{display:block;font-size:14px;margin:2px 0 10px}.bubble-chart{height:82px;display:flex;align-items:end;justify-content:center;gap:0}.bubble{display:block;border-radius:50%;width:68px;height:68px;background:#1676d2}.bubble.b2{width:48px;height:48px;background:#ff756e;margin-left:-2px}.bubble.b3{width:25px;height:25px;background:#7bd3ef;margin-left:-2px}.bar-chart{height:82px;display:flex;align-items:end;justify-content:center;gap:9px}.bar-chart i{display:block;width:32px;border-radius:5px 5px 0 0;background:#2eaa91;height:78px}.bar-chart i+ i{height:54px;background:#292929}
+    .upcoming{background:#fff;border-radius:24px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin:14px 0 34px}.upcoming .label{font-weight:650}.upcoming .sub{font-size:12px;color:#8b9099}.upcoming strong{font-size:16px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;padding:0 4px}.section-head h2{font-size:16px;margin:0}.text-btn{border:0;background:none;color:var(--blue);font-weight:700;padding:8px}
+    .transactions{background:#fff;border-radius:22px;overflow:hidden}.tx{display:flex;align-items:center;gap:11px;padding:13px 15px;border-bottom:1px solid #f0f1f4;touch-action:pan-y;user-select:none}.tx:last-child{border-bottom:0}.tx-icon{width:35px;height:35px;border-radius:50%;background:#eaf1fb;display:grid;place-items:center;font-size:15px;flex:none}.tx-info{flex:1;min-width:0}.tx-title{font-weight:600}.tx-date{font-size:11px;color:var(--muted)}.tx-amount{font-weight:700;white-space:nowrap}.positive{color:var(--green)}.negative{color:var(--ink)}
+    .panel{border:1px solid var(--line);border-radius:20px;padding:19px;background:#fff;margin-bottom:15px}.panel h2{font-size:18px;margin:0 0 5px}.panel p{margin:0 0 18px;color:var(--muted);font-size:13px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:700;color:#526573}.field input,.field select{border:1px solid #dce4e9;border-radius:12px;padding:12px;background:#fff;outline:none;min-width:0}.field input:focus,.field select:focus{border-color:#2988bd;box-shadow:0 0 0 3px #2988bd18}
+    .primary{background:var(--blue);color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:750}.secondary{background:#edf1f6;color:var(--navy);border:0;border-radius:11px;padding:11px 15px;font-weight:700}.form-actions{display:flex;gap:10px;align-items:center;margin-top:17px}.notice{background:#f1f5fa;border-left:3px solid #4c9bc2;padding:12px 14px;border-radius:7px;color:#536a78;font-size:12px;margin-top:15px}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border-bottom:0}.settings-row strong{display:block}.settings-row small{color:var(--muted)}.logo-preview{width:58px;height:58px;border-radius:16px;background:var(--pale);display:grid;place-items:center;overflow:hidden;font-size:25px;color:var(--navy)}.logo-preview img{width:100%;height:100%;object-fit:contain;padding:4px}
+    .empty{padding:30px;text-align:center;color:var(--muted)}.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#172b3a;color:white;padding:11px 17px;border-radius:10px;box-shadow:0 8px 25px #0002;display:none;z-index:10}.pill{font-size:11px;color:#47738c;background:#eaf3f8;padding:4px 8px;border-radius:20px;font-weight:700}
+    .tx-menu-backdrop{position:fixed;inset:0;background:#11182755;z-index:20;display:grid;place-items:center;padding:20px}.tx-menu{background:#fff;border-radius:20px;padding:20px;width:min(320px,100%);box-shadow:0 18px 60px #0003}.tx-menu h3{margin:0 0 5px}.tx-menu p{margin:0 0 15px;color:#777;font-size:12px}.tx-menu button{width:100%;padding:12px;border:0;border-radius:11px;margin-top:8px;background:#edf2f8;font-weight:700;color:#183b56}.tx-menu button.danger{background:#fff0f0;color:#a33}
+    @media(max-width:650px){header{padding:16px 18px 8px}main{padding:18px 14px 28px}.welcome h1{font-size:22px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.panel{padding:16px}.overview-card{min-height:160px;padding:13px 9px}.balance{font-size:35px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><button class="profile" aria-label="Open settings" onclick="showView('settings')">●</button><div class="logo" id="headerLogo" title="Custom wallet logo">L</div><div class="brand-name" id="headerName">LARP Wallet</div></div>
+    <div class="header-tools"><button class="header-tool" aria-label="Accounts" onclick="showView('home')">▣</button><button class="header-tool" aria-label="Search transactions" onclick="showView('transactions')">⌕</button></div>
+  </header>
+  <nav aria-label="Main navigation">
+    <button class="active" data-view="home" onclick="showView('home')">Home</button>
+    <button data-view="payments" onclick="showView('payments')">Payments</button>
+    <button data-view="transactions" onclick="showView('transactions')">Transactions</button>
+    <button data-view="settings" onclick="showView('settings')">Settings</button>
+  </nav>
+
+  <main>
+    <section class="view active" id="home">
+      <div class="home-top"><button class="active" onclick="setAccountTab(this,'everyday')">Everyday</button><button onclick="setAccountTab(this,'savings')">Savings</button></div>
+      <div class="balance-wrap"><div class="balance-label" id="balanceLabel">Everyday balance ⓘ</div><div class="balance" id="homeBalance">$12,450.00</div></div>
+      <div class="overview-grid">
+        <div class="overview-card"><div class="eyebrow">Spending (30 days)</div><strong id="spendingTotal">$0.00</strong><div class="bubble-chart"><i class="bubble"></i><i class="bubble b2"></i><i class="bubble b3"></i></div></div>
+        <div class="overview-card"><div class="eyebrow">Last 30 days</div><strong>Money In &amp; Out</strong><div class="bar-chart"><i></i><i></i></div></div>
+      </div>
+      <div class="upcoming"><div><div class="label">◉ &nbsp;Upcoming</div><div class="sub">Predicted expenses · 30 days</div></div><strong id="upcomingTotal">$0.00</strong></div>
+      <div class="section-head"><h2>Today</h2><button class="text-btn" onclick="showView('transactions')">See all</button></div>
+      <div class="transactions" id="homeTransactions"></div>
+    </section>
+
+    <section class="view" id="payments">
+      <div class="welcome"><div><h1>Payments</h1><div class="muted small">Make a simulated payment.</div></div></div>
+      <div class="panel">
+        <h2 id="paymentHeading">PayID</h2><p id="paymentDescription">Send a payment using a PayID.</p>
+        <div class="form-grid">
+          <div class="field full"><label for="paymentType">Payment type</label><select id="paymentType" onchange="changePaymentType()"><option value="payid">PayID</option><option value="bank">Bank transfer</option><option value="deposit">Add simulated funds</option></select></div>
+          <div class="field full" id="recipientField"><label id="recipientLabel" for="recipient">PayID (email or mobile)</label><input id="recipient" placeholder="e.g. alex@example.com" autocomplete="off"></div>
+          <div class="field" id="bsbField" style="display:none"><label for="bsb">BSB</label><input id="bsb" inputmode="numeric" maxlength="6" placeholder="000000"></div>
+          <div class="field" id="accountField" style="display:none"><label for="account">Account number</label><input id="account" inputmode="numeric" maxlength="10" placeholder="123456789"></div>
+          <div class="field full"><label for="amount">Amount (AUD)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="0.00"></div>
+          <div class="field full"><label for="description">Description</label><input id="description" maxlength="60" placeholder="What's this payment for?"></div>
+        </div>
+        <div class="form-actions"><button class="primary" onclick="submitPayment()">Continue</button><button class="secondary" onclick="clearPayment()">Clear</button></div>
+        <div class="notice">Payments are simulated in this browser only. No funds are sent and no bank or PayID network is contacted.</div>
+      </div>
+    </section>
+
+    <section class="view" id="transactions">
+      <div class="welcome"><div><h1>Transactions</h1><div class="muted small">Your wallet activity.</div></div></div>
+      <div class="transactions" id="allTransactions"></div>
+    </section>
+
+    <section class="view" id="settings">
+      <div class="welcome"><div><h1>Settings</h1><div class="muted small">Personalise your wallet.</div></div></div>
+      <div class="panel">
+        <h2>Appearance</h2><p>Change the name and logo shown in your wallet.</p>
+        <div class="settings-row"><div style="display:flex;align-items:center;gap:13px"><div class="logo-preview" id="logoPreview">L</div><div><strong>Wallet logo</strong><small>Choose an image from your device</small></div></div><button class="secondary" onclick="document.getElementById('logoFile').click()">Choose photo</button><input id="logoFile" type="file" accept="image/*" hidden onchange="uploadLogo(event)"></div>
+        <div class="field" style="margin-top:17px"><label for="customName">Wallet name</label><input id="customName" maxlength="28" placeholder="Enter a wallet name"></div>
+        <div class="field" style="margin-top:17px"><label for="logoSize">Logo size</label><input id="logoSize" type="range" min="30" max="76" value="42" oninput="previewLogoSize(this.value)"><small id="logoSizeLabel" class="muted">42 px</small></div>
+        <div class="form-actions"><button class="primary" onclick="saveBranding()">Save changes</button><button class="secondary" onclick="resetLogo()">Reset logo</button></div>
+      </div>
+      <div class="panel">
+        <h2>Account settings</h2><p>Manage the fictional account shown in this wallet.</p>
+        <div class="field"><label for="balanceEdit">Available balance (AUD)</label><input id="balanceEdit" type="number" min="0" step="0.01"></div>
+        <div class="form-actions"><button class="primary" onclick="saveBalance()">Update balance</button></div>
+      </div>
+      <div class="panel">
+        <h2>About this wallet</h2>
+        <div class="notice" style="margin-top:10px"><strong>Fictional wallet simulation.</strong> This app is not affiliated with or endorsed by any bank. Balances, account details, PayID references, transfers and receipts are fictional. No real money moves, and no banking network is connected.</div>
+        <div class="form-actions"><button class="secondary" onclick="resetApp()">Reset all local data</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div><div id="txMenuRoot"></div>
+
+<script>
+const STORE='larp-wallet-v1';
+const initial={name:'LARP Wallet',logo:'',logoSize:42,balance:12450,transactions:[
+  {id:1,title:'Coffee Shop',detail:'Card purchase',date:new Date(Date.now()-3600000).toISOString(),amount:-5.50},
+  {id:2,title:'Pay received',detail:'Simulated deposit',date:new Date(Date.now()-86400000).toISOString(),amount:850},
+  {id:3,title:'Online Shopping',detail:'Card purchase',date:new Date(Date.now()-172800000).toISOString(),amount:-129.99}
+]};
+let data=loadData(), pendingLogo=data.logo;
+function loadData(){try{return {...initial,...JSON.parse(localStorage.getItem(STORE)||'{}')}}catch{return structuredClone(initial)}}
+function persist(){localStorage.setItem(STORE,JSON.stringify(data))}
+function money(n){return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(n)}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2600)}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='settings')document.getElementById('balanceEdit').value=Number(data.balance).toFixed(2);render()}
+function showPayment(type){showView('payments');document.getElementById('paymentType').value=type;changePaymentType()}
+function changePaymentType(){const type=document.getElementById('paymentType').value;const deposit=type==='deposit',bank=type==='bank';document.getElementById('paymentHeading').textContent=deposit?'Add simulated funds':bank?'Bank transfer':'PayID';document.getElementById('paymentDescription').textContent=deposit?'Add fictional funds to your wallet balance.':bank?'Enter fictional bank account details for a simulated transfer.':'Send a simulated payment using a PayID.';document.getElementById('recipientField').style.display=deposit?'none':'flex';document.getElementById('recipientLabel').textContent=bank?'Account name':'PayID (email or mobile)';document.getElementById('recipient').placeholder=bank?'e.g. Alex Taylor':'e.g. alex@example.com';document.getElementById('bsbField').style.display=bank?'flex':'none';document.getElementById('accountField').style.display=bank?'flex':'none'}
+function clearPayment(){['recipient','bsb','account','amount','description'].forEach(id=>document.getElementById(id).value='')}
+function submitPayment(){const type=document.getElementById('paymentType').value,amount=Number(document.getElementById('amount').value),recipient=document.getElementById('recipient').value.trim(),description=document.getElementById('description').value.trim();if(!Number.isFinite(amount)||amount<=0){showToast('Enter a valid amount.');return}if(type!=='deposit'&&!recipient){showToast('Enter the recipient details.');return}if(type==='bank'&&(!/^\d{6}$/.test(document.getElementById('bsb').value.replace('-',''))||!/^\d{6,10}$/.test(document.getElementById('account').value))){showToast('Enter a 6-digit BSB and valid account number.');return}if(type!=='deposit'&&amount>data.balance){showToast('Insufficient simulated funds.');return}
+ let title,detail,delta;if(type==='deposit'){title='Simulated funds added';detail=description||'Manual wallet top-up';delta=amount}else{title=type==='bank'?'Bank transfer':'PayID payment';detail=(recipient+(description?' · '+description:''));delta=-amount}
+ data.balance=Math.round((Number(data.balance)+delta)*100)/100;data.transactions.unshift({id:Date.now(),title,detail,date:new Date().toISOString(),amount:delta});persist();clearPayment();render();showToast('Simulated transaction completed.')}
+function txMarkup(tx){const incoming=tx.amount>0;return `<div class="tx" data-tx-id="${tx.id}"><div class="tx-icon">${incoming?'↙':'↗'}</div><div class="tx-info"><div class="tx-title">${escapeHTML(tx.title)}</div><div class="tx-date">${escapeHTML(tx.detail||'Wallet transaction')} · ${new Date(tx.date).toLocaleString('en-AU',{dateStyle:'medium',timeStyle:'short'})}</div></div><div class="tx-amount ${incoming?'positive':'negative'}">${incoming?'+':'−'}${money(Math.abs(tx.amount))}</div></div>`}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){document.getElementById('homeBalance').textContent=money(data.balance);const outgoing=data.transactions.filter(t=>t.amount<0).reduce((a,t)=>a+Math.abs(t.amount),0);document.getElementById('spendingTotal').textContent=money(outgoing);document.getElementById('upcomingTotal').textContent=money(outgoing*.19);document.getElementById('homeTransactions').innerHTML=data.transactions.length?data.transactions.slice(0,5).map(txMarkup).join(''):'<div class="empty">No transactions yet.</div>';document.getElementById('allTransactions').innerHTML=data.transactions.length?data.transactions.map(txMarkup).join(''):'<div class="empty">No transactions yet.</div>';document.getElementById('headerName').textContent=data.name;document.title=data.name;const logoHTML=data.logo?`<img src="${data.logo}" alt="Custom wallet logo">`:escapeHTML((data.name||'L').charAt(0).toUpperCase());document.getElementById('headerLogo').innerHTML=logoHTML;document.getElementById('logoPreview').innerHTML=logoHTML;document.getElementById('customName').value=data.name;document.documentElement.style.setProperty('--logo-size',(data.logoSize||42)+'px');document.getElementById('logoSize').value=data.logoSize||42;document.getElementById('logoSizeLabel').textContent=(data.logoSize||42)+' px'}
+function uploadLogo(event){const file=event.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){showToast('Choose an image file.');return}if(file.size>3*1024*1024){showToast('Please choose an image under 3 MB.');return}const reader=new FileReader();reader.onload=()=>{pendingLogo=reader.result;document.getElementById('logoPreview').innerHTML=`<img src="${pendingLogo}" alt="Logo preview">`;showToast('Photo selected. Save changes to apply.')};reader.readAsDataURL(file)}
+function saveBranding(){const name=document.getElementById('customName').value.trim();if(!name){showToast('Enter a wallet name.');return}data.name=name;data.logo=pendingLogo;persist();render();showToast('Appearance saved.')}
+function resetLogo(){pendingLogo='';data.logo='';persist();render();showToast('Logo reset.')}
+function saveBalance(){const val=Number(document.getElementById('balanceEdit').value);if(!Number.isFinite(val)||val<0){showToast('Enter a valid balance.');return}data.balance=Math.round(val*100)/100;persist();render();showToast('Balance updated.')}
+function resetApp(){if(!confirm('Reset the wallet name, logo, balance and transaction history on this device?'))return;localStorage.removeItem(STORE);data=structuredClone(initial);pendingLogo='';render();showToast('Wallet reset.')}
+
+function setAccountTab(button,tab){document.querySelectorAll('.home-top button').forEach(b=>b.classList.toggle('active',b===button));document.getElementById('balanceLabel').textContent=tab==='savings'?'Savings balance ⓘ':'Everyday balance ⓘ';document.getElementById('homeBalance').textContent=money(tab==='savings'?0:data.balance);}
+function previewLogoSize(value){document.documentElement.style.setProperty('--logo-size',value+'px');document.getElementById('logoSizeLabel').textContent=value+' px';data.logoSize=Number(value);persist()}
+let holdTimer=null,holdTriggered=false;
+function showTransactionMenu(id){const tx=data.transactions.find(t=>String(t.id)===String(id));if(!tx)return;const root=document.getElementById('txMenuRoot');root.innerHTML=`<div class="tx-menu-backdrop" onclick="closeTxMenu(event)"><div class="tx-menu" onclick="event.stopPropagation()"><h3>${escapeHTML(tx.title)}</h3><p>Transaction options</p><button onclick="editTransaction('${tx.id}')">Edit transaction</button><button onclick="duplicateTransaction('${tx.id}')">Duplicate transaction</button><button class="danger" onclick="closeTxMenu()">Cancel</button></div></div>`}
+function closeTxMenu(event){if(event&&event.target!==event.currentTarget)return;document.getElementById('txMenuRoot').innerHTML=''}
+function editTransaction(id){const tx=data.transactions.find(t=>String(t.id)===String(id));if(!tx)return;const title=prompt('Transaction name:',tx.title);if(title===null)return;const detail=prompt('Transaction details:',tx.detail||'');if(detail===null)return;const amount=prompt('Amount in AUD (use a minus sign for money out):',String(tx.amount));if(amount===null)return;const n=Number(amount);if(!title.trim()||!Number.isFinite(n)||n===0){showToast('Please enter a name and a valid non-zero amount.');return}data.balance=Math.round((data.balance-tx.amount+n)*100)/100;tx.title=title.trim();tx.detail=detail.trim();tx.amount=Math.round(n*100)/100;persist();render();closeTxMenu();showToast('Transaction updated.')}
+function duplicateTransaction(id){const tx=data.transactions.find(t=>String(t.id)===String(id));if(!tx)return;const copy={...tx,id:Date.now(),title:tx.title+' (copy)',date:new Date().toISOString()};data.transactions.unshift(copy);data.balance=Math.round((data.balance+copy.amount)*100)/100;persist();render();closeTxMenu();showToast('Transaction duplicated.')}
+function attachLongPress(){document.querySelectorAll('.tx').forEach(el=>{el.addEventListener('pointerdown',()=>{holdTriggered=false;const id=el.dataset.txId;holdTimer=setTimeout(()=>{holdTriggered=true;showTransactionMenu(id)},3000)});['pointerup','pointerleave','pointercancel'].forEach(evt=>el.addEventListener(evt,()=>clearTimeout(holdTimer)));el.addEventListener('contextmenu',e=>e.preventDefault())})}
+const originalRender=render;render=function(){originalRender();attachLongPress()};
+render();changePaymentType();
+</script>
+</body>
+</html>
